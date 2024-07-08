@@ -1,40 +1,27 @@
-# Punto fijo
-# OmeGa2B
-
-from sympy import *
+from sympy import Symbol, N, sympify
 import os
 
 def verificacion_funcion_syntaxis():
     while True:
         try:
-            # sen = sin
-            # e = exp()
-            # pi = pi
             ecuacion = input("\nIngrese la ecuacion con la cual se va a trabajar: ")
-            #parse_expr
             return sympify(ecuacion)
-
         except Exception as e:
             print("\n-------------------------------")
-            print("\nSe ha producido un error: ",e)
+            print("\nSe ha producido un error: ", e)
             print("\nPor favor intentelo de nuevo")
             print("\n-------------------------------")
 
 def calculo_error_relativo(valor_medio1, valor_medio2):
-    return abs((valor_medio2-valor_medio1)/valor_medio2)
+    return abs((valor_medio2 - valor_medio1) / valor_medio2)
 
 def intervalo():
-    a = float(input("Introdusca el valor del extremo a del intervalo: "))
-    b = float(input("Introdusca el valor del extremo b del intervalo: "))
-    return a,b
+    a = float(input("Introduzca el valor del extremo a del intervalo: "))
+    b = float(input("Introduzca el valor del extremo b del intervalo: "))
+    return a, b
 
-def verificacion_valor_imagenes(funcion,a,b,Max_iteraciones,count,valor_medio1, tol=1e-6):
-    # tol es un parámetro utilizado en algoritmos numéricos para determinar
-    # cuando se considera que una aproximación es lo suficientemente cercana a una solución exacta.
-
-    #calculo de las imagenes
+def verificacion_valor_imagenes(funcion, a, b, Max_iteraciones, count, valor_medio1, tol=1e-6):
     x = Symbol('x')
-    # = funcion.subs(x,a).evalf
     while True:
         try:
             f_a = N(funcion.subs(x, a))
@@ -42,18 +29,18 @@ def verificacion_valor_imagenes(funcion,a,b,Max_iteraciones,count,valor_medio1, 
             break
         except Exception as e:
             print("\n-------------------------------")
-            print("\nSe ha producido un error: ",e)
-            print("\nLa funcion no este definida en el rango, introdusca un nuevo intervalo")
-            a,b = intervalo()
+            print("\nSe ha producido un error: ", e)
+            print("\nLa funcion no está definida en el rango, introduzca un nuevo intervalo")
+            a, b = intervalo()
             print("\n-------------------------------")
 
-    archivo.write('\niteracion: {}'.format(count))
-    archivo.write('\na={}, b= {}, f(a) = {}, f(b) = {}'.format(a,b,f_a,f_b))
-    try:
-        if (b - a)/2 > tol and count < Max_iteraciones:
-            valor_medio = (a+b)/2
+    archivo.write('\nIteracion: {}'.format(count))
+    archivo.write('\na={}, b= {}, f(a) = {}, f(b) = {}'.format(a, b, f_a, f_b))
 
-            #Calculo del error relativo de acuerdo a las aproximaciones a partir de la segunda iteracion
+    try:
+        if (b - a) / 2 > tol and count < Max_iteraciones:
+            valor_medio = (a + b) / 2
+
             if count == 0:
                 valor_medio1 = valor_medio
             else:
@@ -61,35 +48,36 @@ def verificacion_valor_imagenes(funcion,a,b,Max_iteraciones,count,valor_medio1, 
                 valor_medio1 = valor_medio
                 archivo.write(" Error relativo: {}".format(error_relativo))
                 if error_relativo < 0.0001:
-                    return (a+b)/2
+                    return (a + b) / 2
 
             archivo.write('\n-----------------------------------------------------------------------------------------')
 
-            #metodo por biseccion
             f_vm = N(funcion.subs(x, valor_medio))
             if f_vm == 0:
-                return f_vm
-            elif f_a*f_vm < 0:
-                return verificacion_valor_imagenes(funcion,a,valor_medio,Max_iteraciones,count+1, valor_medio1)
+                return valor_medio
+            elif f_a * f_vm < 0:
+                return verificacion_valor_imagenes(funcion, a, valor_medio, Max_iteraciones, count + 1, valor_medio1)
             else:
-                return verificacion_valor_imagenes(funcion,valor_medio,b,Max_iteraciones,count+1, valor_medio1)
+                return verificacion_valor_imagenes(funcion, valor_medio, b, Max_iteraciones, count + 1, valor_medio1)
         else:
-            return (a+b)/2
+            print(f"El método falló con {count} iteraciones")
     except:
-        print("el metodo fallo con {} iteracoiones: ".format(count))
-
+        print(f"El método falló con {count} iteraciones")
 
 if __name__ == '__main__':
-    #creacion de la ruta donde se guardara el txt con los datos de las iteraciones y de los errores relativos
     name = 'Metodo_biseccion.txt'
-    dirc = ''#direccion donde se guardara el archivo
+    dirc = ''
     dirc_completa = os.path.join(dirc, name)
     archivo = open(dirc_completa, 'w')
 
-    #parametros para el metodo
     funcion = verificacion_funcion_syntaxis()
-    Max_iteraciones = int(input("Ingrese el numero maximo de iteraciones que desea que se realicen: "))
-    a,b = intervalo()
-    solucion = verificacion_valor_imagenes(funcion,a,b, Max_iteraciones, 0,0)
+    Max_iteraciones = int(input("Ingrese el número máximo de iteraciones que desea que se realicen: "))
+    a, b = intervalo()
+    solucion = verificacion_valor_imagenes(funcion, a, b, Max_iteraciones, 0, 0)
+
+    if solucion is None:
+        print("\nLa función está indeterminada en alguno de los extremos")
+    else:
+        print("La solución es: ", solucion)
+
     archivo.close()
-    print("La solucion es: ", solucion)

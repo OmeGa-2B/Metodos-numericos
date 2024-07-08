@@ -18,22 +18,12 @@ def valor_aproximacion():
     va = float(input("Ingrese la aproximacion inicial: "))
     return va
 
-def metodo_newton(funcion, aproximacion, iteraciones_maximas,count,tol):
+def evaluacion_funcion(funcion, aproximacion):
     x = Symbol('x')
-    # = funcion.subs(x,a).evalf
-    archivo.write('\n\n-----------------------------------------------------------------------------------------')
-    archivo.write(f"\nIteracion {count}")
     while True:
         try:
-            #p = p0 -f(p0)/f'(p0)
             f_p = N(funcion.subs(x,aproximacion))
-            archivo.write(f"\n funcion evaluada en p0: {f_p}")
-            df = diff(funcion,x)
-            archivo.write(f"\nfuncion derivada: {df}")
-            df_p = N(df.subs(x,aproximacion))
-            archivo.write(f"     funcion derivada evaluada: {df_p}")
-            p = aproximacion-(f_p/df_p)
-            break
+            return f_p
         except Exception as e:
             print("\n-------------------------------")
             print("\nSe ha producido un error: ",e)
@@ -41,21 +31,29 @@ def metodo_newton(funcion, aproximacion, iteraciones_maximas,count,tol):
             aproximacion = valor_aproximacion()
             print("\n-------------------------------")
 
-    archivo.write("\np0: {}".format(aproximacion))
-    archivo.write("   p: {}".format(p))
-    archivo.write(f"\n error absoluto {p-aproximacion}")
-
-    if count < iteraciones_maximas:
-        if abs(p-aproximacion) < tol:
-            return p
+def metodo_steffensen(funcion,aproximacion,Iteraciones_maximas,count,tol):
+    archivo.write('\n\n-----------------------------------------------------------------------------------------')
+    archivo.write(f"\n\n iteracion: {count}  \n aproximacion(p0): {aproximacion}")
+    try: 
+        if count < Iteraciones_maximas:
+            p1 = evaluacion_funcion(funcion, aproximacion)
+            p2 = evaluacion_funcion(funcion, p1)
+            p = aproximacion-pow(p1-aproximacion,2)/(p2-(2*p1)+aproximacion)
+            archivo.write(f"  p1: {p1}   p2: {p2}    p: {p}")
+            archivo.write(f"\nError absoluto: {abs(p-aproximacion)}")
+            if abs(p-aproximacion) < tol:
+                return p
+            else:
+                return metodo_steffensen(funcion,p,Iteraciones_maximas,count+1,tol)
         else:
-            return metodo_newton(funcion,p,iteraciones_maximas,count+1,1e-6)
-    else:
-        print("\nEl metodo fallo despues de {} iteraciones".format(count))
+            archivo.write(f"\n\n EL metodo fallo con {count} iteraciones")
+            return False
+    except Exception as e:
+        print(f"\nOcurrio un error de tipo : {e}")
         return False
 
 if __name__ == '__main__':
-    name = 'Metodo_Newton.txt'
+    name = 'Metodo_Steffense.txt'
     dirc = ''
     dirc_completa = os.path.join(dirc, name)
     archivo = open(dirc_completa, 'w')
@@ -63,7 +61,7 @@ if __name__ == '__main__':
     funcion = verificacion_funcion_syntaxis()
     aproximacion_inicial = valor_aproximacion()
     Iteraciones_maximas = int(input('Ingrese el umero maximo de iteraciones: '))
-    p = metodo_newton(funcion,aproximacion_inicial,Iteraciones_maximas,0,tol = 1e-6)
-    archivo.close()
+    p = metodo_steffensen(funcion,aproximacion_inicial,Iteraciones_maximas,0,tol = 1e-6)
     if p != False:
-        print("\nprocedimiento realizado con exito \nsolucion: {}".format(p))
+        archivo.write("\n\n\nprocedimiento realizado con exito, solucion: {}".format(p))
+    archivo.close()

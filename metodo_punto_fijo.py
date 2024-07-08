@@ -36,6 +36,7 @@ def iteracion_punto_fijo(funcion,aproximacion_inicial, Iteraciones_maximas,tol,c
             print("\n-------------------------------")
 
     archivo.write('\n\n-----------------------------------------------------------------------------------------')
+    archivo.write('\n Iteracion {}'.format(count+1))
     archivo.write("\np0: {}".format(aproximacion_inicial))
     archivo.write("\np: {}".format(p))
     if count < Iteraciones_maximas:
@@ -43,9 +44,9 @@ def iteracion_punto_fijo(funcion,aproximacion_inicial, Iteraciones_maximas,tol,c
             return p
         else:
             return iteracion_punto_fijo(funcion,p,Iteraciones_maximas,1e-6,count+1)
-
-    print("\nEl metodo fallo despues de {} iteraciones".format(count))
-    return
+    else:
+        print("\nEl metodo fallo despues de {} iteraciones".format(count))
+        return
 
 
 def valor_aproximacion():
@@ -64,5 +65,8 @@ if __name__ == '__main__':
     aproximacion_inicial = valor_aproximacion()
     Iteraciones_maximas = int(input('Ingrese el numero maximo de interacions: '))
     p = iteracion_punto_fijo(funcion,aproximacion_inicial,Iteraciones_maximas,1e-6,0)
+    if p == None:
+        archivo.write("\n\n El metodo se encontro con una indeterminacion")
+    else:
+        archivo.write("\n\n\nprocedimiento realizado con exito, solucion: {}".format(p))
     archivo.close()
-    print("\nprocedimiento realizado con exito \nsolucion: {}".format(p))
